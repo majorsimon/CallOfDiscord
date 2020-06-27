@@ -91,6 +91,7 @@ def doTheThing():
         error_exit('Missing mongodb configuration')
 
     logger.info('MongoDB credentials defined')
+    logger.debug(creds)
     mongo = getDBClient(creds['username'], creds['password'], creds['database'])
     logger.info('MongoDB client defined')
 

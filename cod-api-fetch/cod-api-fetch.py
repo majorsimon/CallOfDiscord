@@ -8,18 +8,20 @@ import cod
 import os
 
 
+LOG_LEVEL = logging.DEBUG
+
 # Create a custom logger
 logger = logging.getLogger(__name__)
 
 # Create handler
 handler = logging.StreamHandler()
-handler.setLevel(logging.DEBUG)
+handler.setLevel(LOG_LEVEL)
 # Create formatter and add it to handler
 lformat = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(lformat)
 # Add handler to the logger
 logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(LOG_LEVEL)
 
 def error_exit(message):
     logger.error(message)
@@ -33,7 +35,8 @@ def getDBClient(
     port=27017
     ):
 
-    connstr = "mongodb://%s:%s@%s:%s" % (username, password, host, port)
+    connstr = "mongodb://%s:%s@%s:%s/%s" % (username, password, host, port, database)
+    logger.debug('MongoDB Connection string: "%s"' % connstr)
     return MongoClient(connstr)[database]
 
 def getUsers(mongo):
@@ -55,16 +58,15 @@ def getLatestStats(user):
 
     results = {}
     for name, endpoint in cod.COD_ENDPOINTS['user'].items():
-        title = 'mw'
-        platform = user['cod-api']['platform']
-        startdate = 0
-        enddate = 0
-        userid = user['cod-api']['userid']
-
         logger.debug("Fetching '%s' stats..." % name)
         results[name] = client.sendRequest(
             cod.DEFAULT_BASE_URL, 
-            endpoint.format(locals()),
+            endpoint.format(**{
+                'platform': user['cod-api']['platform'],
+                'startdate': 0,
+                'enddate': 0,
+                'userid': user['cod-api']['userid']
+            }),
             'GET'
         )
         logger.debug("Finished fetching '%s' stats" % name)
@@ -106,6 +108,10 @@ def doTheThing():
     logger.info('Pushing stats to DB...')
     addLatestStats(mongo, stats)
     logger.info('Finished pushing stats to DB')
+
+    logger.info('Disconnecting from MongoDB...')
+    mongo.logout()
+    logger.info('Finished disconnecting from MongoDB')
 
     logger.info('Finished running stats collection')
 

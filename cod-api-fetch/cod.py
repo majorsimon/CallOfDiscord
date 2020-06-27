@@ -25,7 +25,7 @@ COD_ENDPOINTS = {
         'wzstats': 'stats/cod/v1/title/mw/platform/{platform}/gamer/{userid}/profile/type/wz',
         'loot': "loot/title/mw/platform/{platform}/gamer/{userid}/status/en",
         'analysis': "ce/v2/title/mw/platform/{platform}/gametype/all/gamer/{userid}/summary/match_analysis/contentType/full/end/0/matchAnalysis/mobile/en",
-        'codpoints': "inventory/v1/title/{title}/platform/{platform}/gamer/{userid}/currency"
+        'codpoints': "inventory/v1/title/mw/platform/{platform}/gamer/{userid}/currency"
     }
 }
 
